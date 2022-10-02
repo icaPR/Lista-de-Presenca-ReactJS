@@ -1,11 +1,20 @@
 import "./styles.css";
-import { Card } from "../../components/Card/index";
+import { Card, CardProps } from "../../components/Card/index";
 import React, { useState, useEffect } from "react";
 
+type typeResponse = {
+  name: string;
+  avatar_url: string;
+};
+type User = {
+  name: string;
+  avatar: string;
+};
+
 export function App() {
-  const [studentName, setStudentName] = useState();
-  const [students, setStudents] = useState([]);
-  const [user, setUser] = useState({ name: "", avatar: "" });
+  const [studentName, setStudentName] = useState("");
+  const [students, setStudents] = useState<CardProps[]>([]);
+  const [user, setUser] = useState<User>({} as User);
 
   function handleAddStudent() {
     const newStudent = {
@@ -16,18 +25,21 @@ export function App() {
         second: "2-digit",
       }),
     };
-    setStudents((prevState) => [...students, newStudent]);
+    setStudents([...students, newStudent]);
   }
   useEffect(() => {
-    fetch("https://api.github.com/users/icaPR").then((response) =>
-      response.json().then((data) => {
-        setUser({
-          name: data.name,
-          avatar: data.avatar_url,
-        });
-      })
-    );
-  });
+    async function fetchData() {
+      const reponse = await fetch("https://api.github.com/users/icaPR");
+      const data = (await reponse.json()) as typeResponse;
+
+      setUser({
+        name: data.name,
+        avatar: data.avatar_url,
+      });
+      console.log(data);
+    }
+    fetchData();
+  }, []);
 
   return (
     <div className="container">
